@@ -45,7 +45,7 @@ export default function AdminRoutes({
       />
 
       <Route
-        path="/carruseles"
+        path="carruseles"
         element={<CarruselAdmin productos= {productos} />}
       />
 

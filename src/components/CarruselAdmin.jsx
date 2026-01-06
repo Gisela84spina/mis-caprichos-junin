@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCarrusel } from "../hooks/useCarrusel";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 const CLOUD_NAME = "dy2lgqgk6";
 const UPLOAD_PRESET = "tienda_upload";
 const MAX_PRODUCTOS = 5;
 
-export default function CarruselAdmin({ productos }) {
+export default function CarruselAdmin() {
   const {
     carruseles,
     agregarCarrusel,
@@ -14,53 +16,71 @@ export default function CarruselAdmin({ productos }) {
     actualizarCarrusel
   } = useCarrusel();
 
+  const [productosLocal, setProductosLocal] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+
+  // agregar
   const [titulo, setTitulo] = useState("");
   const [categoria, setCategoria] = useState("");
-  const [preview, setPreview] = useState("");
+  const [previews, setPreviews] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
 
-  /* ------------------ SUBIR IMAGEN ------------------ */
-  const handleImagenUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // editar
+  const [editandoId, setEditandoId] = useState(null);
+  const [tituloEdit, setTituloEdit] = useState("");
+  const [imagenesEdit, setImagenesEdit] = useState([]);
 
-    setSubiendo(true);
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        { method: "POST", body: formData }
+  useEffect(() => {
+    const cargarProductos = async () => {
+      const snap = await getDocs(collection(db, "productos"));
+      setProductosLocal(
+        snap.docs.map(d => ({ id: d.id, ...d.data() }))
       );
+    };
+    cargarProductos();
+  }, []);
 
-      const data = await res.json();
-      setPreview(data.secure_url);
-    } catch {
-      alert("Error subiendo imagen");
+  /* ================= SUBIR IMÁGENES ================= */
+  const subirImagenes = async (files) => {
+    setSubiendo(true);
+    try {
+      const uploads = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", UPLOAD_PRESET);
+
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            { method: "POST", body: formData }
+          );
+
+          const data = await res.json();
+          return data.secure_url;
+        })
+      );
+      return uploads;
     } finally {
       setSubiendo(false);
     }
   };
 
-  /* ------------------ AGREGAR CARRUSEL ------------------ */
+  /* ================= AGREGAR ================= */
   const handleAgregar = async () => {
-    if (!titulo || !preview || subiendo) return;
+    if (!titulo || previews.length === 0 || subiendo) return;
 
     await agregarCarrusel({
       titulo,
       categoria,
-      url: preview,
+      imagenes: previews,
+      url: previews[0],
       productos: [],
       orden: carruseles.length
     });
 
     setTitulo("");
     setCategoria("");
-    setPreview("");
+    setPreviews([]);
   };
 
   return (
@@ -70,7 +90,6 @@ export default function CarruselAdmin({ productos }) {
       {/* ================= AGREGAR ================= */}
       <div className="border rounded-lg p-4 mb-10 space-y-4">
         <input
-          type="text"
           placeholder="Título"
           value={titulo}
           onChange={e => setTitulo(e.target.value)}
@@ -78,7 +97,6 @@ export default function CarruselAdmin({ productos }) {
         />
 
         <input
-          type="text"
           placeholder="Categoría (opcional)"
           value={categoria}
           onChange={e => setCategoria(e.target.value)}
@@ -87,45 +105,42 @@ export default function CarruselAdmin({ productos }) {
 
         <input
           type="file"
+          multiple
           accept="image/*"
-          onChange={handleImagenUpload}
+          onChange={async e => {
+            const imgs = await subirImagenes(e.target.files);
+            setPreviews(prev => [...prev, ...imgs]);
+          }}
         />
 
-        {preview && (
-          <img
-            src={preview}
-            className="w-full sm:w-64 h-36 object-cover rounded"
-            alt="preview"
-          />
-        )}
+        <div className="flex gap-2 flex-wrap">
+          {previews.map((img, i) => (
+            <img key={i} src={img} className="w-32 h-20 rounded object-cover" />
+          ))}
+        </div>
 
         <button
           onClick={handleAgregar}
-          disabled={subiendo || !preview || !titulo}
-          className={`px-4 py-2 rounded text-white ${
-            subiendo || !preview || !titulo
-              ? "bg-gray-400"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          disabled={subiendo || previews.length === 0 || !titulo}
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
         >
           Agregar carrusel
         </button>
       </div>
 
-      {/* ================= LISTA + ORDEN ================= */}
+      {/* ================= LISTA ================= */}
       <div className="space-y-4">
         {carruseles.map((c, index) => (
-          <div key={c.id} className="border p-4 rounded-lg space-y-3">
-            {/* HEADER */}
+          <div key={c.id} className="border rounded-lg p-4 space-y-3">
+
+            {/* ---------- HEADER ---------- */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img
-                  src={c.url}
-                  className="w-16 h-10 object-cover rounded"
-                  alt={c.titulo}
-                />
+                <img src={c.url} className="w-16 h-10 rounded object-cover" />
                 <div>
-                  <p className="font-medium">{c.titulo}</p>
+                  {editandoId !== c.id && (
+                    <p className="font-medium">{c.titulo}</p>
+                  )}
                   <p className="text-xs text-gray-500">
                     Productos: {c.productos?.length || 0} / {MAX_PRODUCTOS}
                   </p>
@@ -134,9 +149,20 @@ export default function CarruselAdmin({ productos }) {
 
               <div className="flex gap-2">
                 <button
+                  onClick={() => {
+                    setEditandoId(c.id);
+                    setTituloEdit(c.titulo);
+                    setImagenesEdit(c.imagenes || []);
+                  }}
+                  className="px-3 py-1 bg-blue-500 text-white rounded"
+                >
+                  Editar
+                </button>
+
+                <button
                   onClick={() => moverCarrusel(c, "up")}
                   disabled={index === 0}
-                  className="px-2 py-1 bg-gray-200 rounded disabled:opacity-40"
+                  className="px-2 bg-gray-200 rounded"
                 >
                   ↑
                 </button>
@@ -144,79 +170,130 @@ export default function CarruselAdmin({ productos }) {
                 <button
                   onClick={() => moverCarrusel(c, "down")}
                   disabled={index === carruseles.length - 1}
-                  className="px-2 py-1 bg-gray-200 rounded disabled:opacity-40"
+                  className="px-2 bg-gray-200 rounded"
                 >
                   ↓
                 </button>
 
                 <button
                   onClick={() => eliminarCarrusel(c.id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded"
+                  className="px-3 bg-red-600 text-white rounded"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* ================= PRODUCTOS ================= */}
+            {/* ---------- EDITOR ---------- */}
+            {editandoId === c.id && (
+              <div className="bg-gray-50 border rounded p-4 space-y-3">
+                <input
+                  value={tituloEdit}
+                  onChange={e => setTituloEdit(e.target.value)}
+                  className="w-full border p-2 rounded"
+                />
+
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={async e => {
+                    const imgs = await subirImagenes(e.target.files);
+                    setImagenesEdit(prev => [...prev, ...imgs]);
+                  }}
+                />
+
+                <div className="flex gap-2 flex-wrap">
+                  {imagenesEdit.map((img, i) => (
+                    <div key={i} className="relative">
+                      <img src={img} className="w-32 h-20 rounded object-cover" />
+                      <button
+                        onClick={() =>
+                          setImagenesEdit(prev =>
+                            prev.filter((_, idx) => idx !== i)
+                          )
+                        }
+                        className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      await actualizarCarrusel(c.id, {
+                        titulo: tituloEdit,
+                        imagenes: imagenesEdit,
+                        url: imagenesEdit[0] || ""
+                      });
+                      setEditandoId(null);
+                    }}
+                    className="px-4 py-2 bg-green-600 text-white rounded"
+                  >
+                    Guardar
+                  </button>
+
+                  <button
+                    onClick={() => setEditandoId(null)}
+                    className="px-4 py-2 bg-gray-400 text-white rounded"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ---------- PRODUCTOS ---------- */}
             <div className="border-t pt-3">
               <input
-                type="text"
                 placeholder="Buscar producto..."
                 value={busqueda}
                 onChange={e => setBusqueda(e.target.value)}
-                className="w-full border p-2 rounded mb-3 text-sm"
+                className="w-full border p-2 rounded mb-2 text-sm"
               />
 
               <div className="max-h-48 overflow-y-auto space-y-2">
-                {productos
+                {productosLocal
                   .filter(
                     p =>
                       !p.eliminado &&
-                      p.nombre
-                        .toLowerCase()
-                        .includes(busqueda.toLowerCase())
+                      p.nombre.toLowerCase().includes(busqueda.toLowerCase())
                   )
                   .map(p => {
-                    const activo = c.productos?.includes(p.id);
+                    const activos = c.productos || [];
+                    const activo = activos.includes(p.id);
 
                     return (
-                      <label
-                        key={p.id}
-                        className="flex items-center gap-2 text-sm cursor-pointer"
-                      >
+                      <label key={p.id} className="flex gap-2 text-sm">
                         <input
                           type="checkbox"
                           checked={activo}
                           onChange={() => {
-                            if (
-                              !activo &&
-                              (c.productos?.length || 0) >= MAX_PRODUCTOS
-                            ) {
-                              alert("Máximo 5 productos por carrusel");
+                            if (!activo && activos.length >= MAX_PRODUCTOS) {
+                              alert("Máximo 5 productos");
                               return;
                             }
 
-                            const nuevosProductos = activo
-                              ? c.productos.filter(id => id !== p.id)
-                              : [...(c.productos || []), p.id];
+                            const nuevos = activo
+                              ? activos.filter(id => id !== p.id)
+                              : [...activos, p.id];
 
-                            actualizarCarrusel(c.id, {
-                              productos: nuevosProductos
-                            });
+                            actualizarCarrusel(c.id, { productos: nuevos });
                           }}
                         />
-                        <span>{p.nombre}</span>
+                        {p.nombre}
                       </label>
                     );
                   })}
               </div>
             </div>
+
           </div>
         ))}
       </div>
     </div>
   );
 }
-
-

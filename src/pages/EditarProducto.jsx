@@ -82,7 +82,8 @@ for (const file of files) {
       precio: Number(precio),
       descripcion,
       imagenes,
-      categoria
+      categoria,
+      eliminado: false
     });
 
     alert("Producto actualizado");

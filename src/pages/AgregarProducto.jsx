@@ -1,6 +1,7 @@
 import { serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CATEGORIAS } from "../data/categorias";
 
 
 
@@ -80,6 +81,7 @@ export default function AgregarProducto({ agregarProducto }) {
       
       nombre,
       precio: Number(precio),
+      imagen: imagenes[0],
       imagenes,
       categoria,
       eliminado: false,
@@ -153,6 +155,11 @@ export default function AgregarProducto({ agregarProducto }) {
           </div>
           <div>
   <label className="block font-semibold mb-1">Categoría:</label>
+
+</div>
+<div>
+  <label className="block font-semibold mb-1">Categoría:</label>
+
   <select
     className="w-full p-2 border rounded"
     value={categoria}
@@ -160,11 +167,15 @@ export default function AgregarProducto({ agregarProducto }) {
     required
   >
     <option value="">Seleccionar categoría</option>
-    <option value="ropa">Ropa</option>
-    <option value="calzado">Calzado</option>
-    <option value="accesorios">Accesorios</option>
+
+    {CATEGORIAS.map(c => (
+      <option key={c.id} value={c.id}>
+        {c.nombre}
+      </option>
+    ))}
   </select>
 </div>
+
 
 
           <button

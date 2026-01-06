@@ -34,18 +34,27 @@ export function useCarrusel() {
   }, []);
 
   const agregarCarrusel = async (data) => {
-    await addDoc(ref, {
+    const docRef = await addDoc(ref, {
       ...data,
       eliminado: false,
       createdAt: new Date()
     });
-    cargar();
+  
+    setCarruseles(prev => [
+      ...prev,
+      { id: docRef.id, ...data, eliminado: false }
+    ]);
   };
-
+  
   const actualizarCarrusel = async (id, data) => {
-    await updateDoc(doc(db, "carrusel", id), data);
-    cargar();
+    await updateDoc(doc(db, "carrusel", id), {
+      ...data,
+      productos: Array.isArray(data.productos) ? data.productos : []
+    });
+    cargar(); 
   };
+  
+  
 
   const eliminarCarrusel = async (id) => {
     await updateDoc(doc(db, "carrusel", id), { eliminado: true });

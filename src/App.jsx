@@ -251,7 +251,7 @@ useEffect(() => {
 {/* TOP BAR MINIMAL */}
 <div className="w-full bg-gray-100 text-center py-1">
   <p className="text-[10px] tracking-widest text-gray-600 uppercase">
-    PASTAS FRESCAS · ARTESANALES · ENVIOS GRATIS
+    PASTAS FRESCAS · ARTESANALES · ENVIOS GRATIS DESDE 2 CAJAS
   </p>
 </div>
 
