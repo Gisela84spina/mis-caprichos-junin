@@ -249,12 +249,16 @@ useEffect(() => {
 
 
 {/* TOP BAR MINIMAL */}
-<div className="w-full bg-gray-100 text-center py-1">
-  <p className="text-[10px] tracking-widest text-gray-600 uppercase">
-    PASTAS FRESCAS · ARTESANALES · ENVIOS GRATIS DESDE 2 CAJAS
-  </p>
-</div>
 
+
+
+<div className="w-full bg-[#DDCBA6] text-center py-1">
+  <p className="text-[10px] tracking-widest text-gray-600 uppercase">
+    IMPORTADOS & SELECCIONADOS PARA TU HOGAR
+  </p>
+
+</div>
+<div className="h-px bg-[#8B2C3A]/15" />
       <Header
         onCartOpen={() => {}}
         cartCount={carrito.reduce((sum, item) => sum + (item.cantidad ?? 1), 0)}

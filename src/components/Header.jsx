@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import logo from "../assets/carmela/logo/logo.jpg";
+import logo from "../assets/misCaprichos/logo/logo.jpg";
 
 
 export default function Header({ cartCount }) {
@@ -16,7 +16,7 @@ export default function Header({ cartCount }) {
   };
 
   return (
-    <header className="bg-[#181716] px-4 py-3">
+    <header className="bg-[#F6EAD7] px-4 py-3 ">
     <div className="flex items-center justify-between gap-4">
    
    
@@ -26,8 +26,8 @@ export default function Header({ cartCount }) {
       <Link to="/" className="flex items-center">
         <img
         src={logo}
-        alt="Carmela pastas caseras"
-        className="h-7 opacity-90 w-auto object-contain rounded-sm"
+        alt="Mis Caprichos"
+        className="rounded-md h-12 w-auto object-contain"
         />
       </Link>
 
@@ -39,17 +39,17 @@ export default function Header({ cartCount }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="
-  w-full
-  px-4 py-2
-  bg-[#1f1e1d]
-  text-[#f5f5f5]
-  text-sm
-  border border-[#2a2928]
-  rounded-md
-  focus:outline-none
-  focus:border-[#c8a96a]
-"
-
+          w-full
+          px-4 py-2
+          bg-white
+          text-[#2E2E2E]
+          text-sm
+          border border-[#E6D8BE]
+          rounded-md
+          focus:outline-none
+          focus:border-[#8B2C3A]
+        "
+        
         />
       </form>
 
@@ -59,10 +59,10 @@ export default function Header({ cartCount }) {
   className="
     flex items-center gap-1
     text-xl
-    text-[#f5f5f5]
+    text-[#8B2C3A]
     transition
     duration-200
-    hover:text-[#c8a96a]
+    hover:text-[#E2B857]
     active:scale-95
   "
 >
@@ -73,8 +73,8 @@ export default function Header({ cartCount }) {
         text-[11px]
         opacity-90
         font-medium
-        text-[#c8a96a]
-        leading-none
+        text-[#E2B857]
+        
       "
     >
       {cartCount}

@@ -5,27 +5,32 @@ export default function CarruselProductos({ titulo, productos }) {
 
   return (
     <section className="my-10">
-      <h2 className="text-lg font-medium mb-4 text-[#e6dcc6] tracking-wide">
-        {titulo}
-      </h2>
+   <h2 className="text-lg font-semibold mb-4 text-[#5F1D27] tracking-wide">
+  {titulo}
+</h2>
+
 
       <div className="flex gap-4 overflow-x-auto pb-2">
-        {productos.slice(0, 5).map(prod => (
+        {productos.map(prod => (
           <Link
             key={prod.id}
             to={`/producto/${prod.id}`}
             className="
-             min-w-[160px]
-             bg-[#1f1e1d]
-             border border-[#2a2928]
-             rounded-lg
-             p-3 flex-shrink-0
-             transition hover:border-[#c8a96a]
-            "
+  min-w-[160px]
+  bg-[#8B2C3A]
+  border border-[#E4CFA6]
+  rounded-lg
+  p-3 flex-shrink-0
+  transition hover:border-[#8B2C3A]
+"
+
 
           >
             <img
-              src={prod.imagenes?.[0] || "/placeholder.png"}
+            
+            src={prod.imagen || prod.imagenes?.[0] || "/placeholder.png"}
+          
+              //src={prod.imagenes?.[0] || "/placeholder.png"}
               alt={prod.nombre}
               className="w-full h-32 object-cover rounded"
             />
@@ -35,7 +40,8 @@ export default function CarruselProductos({ titulo, productos }) {
             </h3>
 
             <p className="text-sm text-[#c8a96a] font-medium">
-             ${prod.precio}
+            ${Number(prod.precio).toLocaleString("es-AR")}
+
             </p>
 
           </Link>
@@ -49,7 +55,7 @@ export default function CarruselProductos({ titulo, productos }) {
            border border-[#2a2928] rounded-lg
            text-sm text-[#e6dcc6] hover:border-[#c8a96a]
            hover:text-white bg-gradient-to-r from-transparent
-           via-[#1f1e1d]/70 to-[#1f1e1d] 
+           via-[#8B2C3A]/70 to-[#8B2C3A] 
            transition
           "
 

@@ -39,8 +39,8 @@ export default function GlobitosCategorias({ globitos }) {
         />
       </div>
 
-      <span className="mt-2 text-sm font-medium capitalize text-[#c8a96a]
-       group-hover:text-white transition">
+      <span className="mt-2 text-sm font-medium capitalize text-[#8B2C3A]
+       group-hover:text-[#c8a96a] transition">
         {g.titulo}
       </span>
     </Link>

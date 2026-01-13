@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../firebase";
+//import { collection, getDocs, query, where } from "firebase/firestore";
+//import { db } from "../firebase";
+import { productosMock } from "../data/productosMock";
+
 import { Link, useSearchParams } from "react-router-dom";
 import { CATEGORIAS } from "../data/categorias";
 
@@ -8,15 +10,46 @@ import { CATEGORIAS } from "../data/categorias";
 export default function ListadoProductos() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const categoria = searchParams.get("categoria") || "all";
   const orden = searchParams.get("orden") || "precio-asc";
   const q = searchParams.get("q") || "";
 
-  const filtro = searchParams.get("filtro");
+ 
 
   useEffect(() => {
+    setLoading(true);
+  
+    let data = [...productosMock];
+  
+    // búsqueda texto
+    if (q) {
+      data = data.filter(p =>
+        p.nombre.toLowerCase().includes(q.toLowerCase())
+      );
+    }
+  
+    // filtro por select de categoría
+    if (categoria !== "all") {
+      data = data.filter(p => p.categoria === categoria);
+    }
+  
+    
+  
+    // orden
+    if (orden === "precio-asc") {
+      data.sort((a, b) => a.precio - b.precio);
+    } else {
+      data.sort((a, b) => b.precio - a.precio);
+    }
+  
+    setProductos(data);
+    setLoading(false);
+  }, [categoria, orden, q ]);
+  
+
+    {/*useEffect(() => {
     const cargarProductos = async () => {
       setLoading(true);
       try {
@@ -74,7 +107,7 @@ if (filtro === "destacado") {
 
     cargarProductos();
   }, [categoria, orden, q, filtro]);
-
+*/}
   const updateParam = (key, value) => {
     const params = new URLSearchParams(searchParams);
     params.set(key, value);

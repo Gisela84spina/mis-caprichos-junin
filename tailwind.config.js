@@ -1,9 +1,19 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html","./src/**/*.{js,jsx}"],
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        scroll: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        scroll: "scroll 20s linear infinite",
+      },
+    },
   },
-  plugins: [],
-}
+  
+plugins: [require('@tailwindcss/line-clamp')],
 
+};

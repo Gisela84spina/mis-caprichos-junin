@@ -1,4 +1,85 @@
 import { useParams } from "react-router-dom";
+import { productosMock } from "../data/productosMock";
+
+export default function ProductPage({ agregarAlCarrito }) {
+  const { id } = useParams();
+
+  const producto = productosMock.find(p => p.id === id);
+
+  if (!producto) {
+    return (
+      <p className="text-center p-6 text-[#e6dcc6]">
+        Producto no encontrado
+      </p>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto bg-[#F6EAD7] min-h-screen">
+      <div className="
+  bg-[#8B2C3A]
+  border border-[#7a2431]
+  rounded-xl
+  p-6
+  flex flex-col items-center
+">
+
+        <img
+          src={producto.imagen}
+          alt={producto.nombre}
+          className="w-64 h-64 object-cover rounded-lg mb-4"
+        />
+
+        <h1 className="text-2xl font-semibold text-[#f5f5f5] mb-2 text-center">
+          {producto.nombre}
+        </h1>
+
+        <p className="text-xl text-[#c8a96a] font-semibold mb-3">
+          ${Number(producto.precio).toLocaleString("es-AR")}
+        </p>
+
+        {producto.descripcion && (
+          <p className="text-[#e6dcc6] mb-4 text-center text-sm leading-relaxed">
+            {producto.descripcion}
+          </p>
+        )}
+
+        <p className="text-[#9c9484] mb-4 text-xs uppercase tracking-wide">
+          Categoría:{" "}
+          <span className="font-medium">
+            {producto.categoria}
+          </span>
+        </p>
+
+        <button
+          onClick={() =>
+            agregarAlCarrito({
+              ...producto,
+              precio: Number(producto.precio),
+            })
+          }
+          className="
+            bg-[#c8a96a]
+            hover:bg-[#b99758]
+            text-[#1f1e1d]
+            font-semibold
+            py-2 px-5
+            rounded-lg
+            text-lg
+            transition
+            w-full max-w-xs
+          "
+        >
+          Agregar al carrito
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+   {/*
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -155,3 +236,4 @@ setProducto({
     </div>
   );
 }
+*/}

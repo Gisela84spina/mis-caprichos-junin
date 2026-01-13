@@ -1,110 +1,54 @@
-
-import { useCarrusel } from "../hooks/useCarrusel";
-
 import GlobitosCategorias from "../components/Globitos";
 import CarruselProductos from "../components/CarruselProductos";
-import bg from "../assets/carmela/background/bg.png";
-import { Link } from "react-router-dom";
 
+import { globitosMock } from "../data/globitosMock";
+import { productosMock } from "../data/productosMock";
 
-export default function Home({ productos, globitos }) {
-  const activos = productos.filter(p => !p.eliminado);
-  const { carruseles, loading } = useCarrusel();
-  console.log("carruseles en home:", carruseles);
+const Dot = () => (
+  <span className="inline-block w-1.5 h-1.5 bg-[#C8A96A]/70 rounded-full shrink-0" />
+);
 
-
+export default function Home() {
   return (
     <>
-    <section
-    className="home-hero"
-    style={{
-      backgroundImage: `
-        linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
-        url(${bg})
-      `,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}
-    >
-    <div className="p-6">
-
-      {/* GLOBITOS */}
-      <GlobitosCategorias globitos={globitos} />
-
-
-{/* CARRUSELES */}
-{loading && <p className="text-white">Cargando carruseles...</p>}
-
-{!loading && carruseles.length === 0 && (
-  <p className="text-white">No hay carruseles</p>
-)}
-
-{!loading && carruseles.map(c => {
-  console.log("carruseles:", c);
-  console.log("ids en carruseles:", c.productos);
-  const productosCarrusel = activos.filter(p =>
-    c.productos?.includes(p.id)
-  );
-  console.log("productos resueltos:", productosCarrusel);
-
-  // Carrusel visual / promo
-  if (!c.productos || c.productos.length === 0) {
-    return (
-      <section
-        key={c.id}
-        className="mb-12"
-      >
-        {/* TITULO DESTACADO */}
-        <h3 className="text-[#c8a96a] uppercase tracking-widest text-sm mb-2">
-          Promo
-        </h3>
-  
-        
-  
-        {/* CARRUSEL DE IMÁGENES */}
-        <div className="flex gap-4 overflow-x-auto">
-          {c.imagenes?.map((img, i) => (
-            <Link
-            key={i}
-            to="/productos"
-            className="min-w-[80%]"
+      {/* TOP BAR */}
+      <section className="bg-[#8B2C3A] px-6 py-4">
+        <div className="relative w-full overflow-hidden">
+          <div className="flex items-center gap-4 animate-scroll hover:[animation-play-state:paused] text-sm text-[#F6EAD7]">
+            <span className="whitespace-nowrap">Pedidos por encargo</span>
+            <Dot />
+            <a
+              href="https://wa.me/5492364539044?text=Hola%20😊%20Quería%20hacer%20una%20consulta"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whitespace-nowrap hover:underline hover:text-[#6B5E3C]"
             >
-            <img
-              
-              src={img}
-              className="
-                h-[220px]
-                w-full
-                rounded-2xl
-                object-cover
-                shadow-lg
-                cursor-pointer
-                hover:opacity-90
-                transition
-              "
-            />
-            </Link>
-          ))}
+              Escribinos y te acompañamos
+            </a>
+            <Dot />
+            <span className="whitespace-nowrap">Envíos disponibles</span>
+          </div>
         </div>
       </section>
-    );
-  }
-  
 
+      {/* CONTENIDO */}
+      <section className="bg-[#F6EAD7] border-t border-[#E4CFA6]">
+        <div className="p-6">
+          {/* GLOBITOS */}
+          <GlobitosCategorias globitos={globitosMock} />
+          <div className="my-8 h-px bg-[#E4CFA6]" />
 
-  return (
-    <CarruselProductos
-      key={c.id}
-      titulo={c.titulo}
-      productos={productosCarrusel}
-      categoria={c.categoria}
-    />
-  );
-})}
-
-    </div>
-    </section>
-
+          {/* DESTACADOS */}
+          <div className="mt-6 ">
+            <CarruselProductos
+              titulo="Destacados"
+              productos={productosMock.filter(p =>
+                p.etiquetas?.includes("destacado")
+              )}
+            />
+          </div>
+        </div>
+      </section>
     </>
   );
 }
