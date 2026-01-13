@@ -27,6 +27,20 @@ export default function Home() {
             </a>
             <Dot />
             <span className="whitespace-nowrap">Envíos disponibles</span>
+            <span className="whitespace-nowrap">Pedidos por encargo</span>
+            <Dot />
+            <a
+              href="https://wa.me/5492364539044?text=Hola%20😊%20Quería%20hacer%20una%20consulta"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whitespace-nowrap hover:underline hover:text-[#6B5E3C]"
+            >
+              Escribinos y te acompañamos
+            </a>
+            <Dot />
+            <span className="whitespace-nowrap">Envíos disponibles</span>
+          
+          
           </div>
         </div>
       </section>
